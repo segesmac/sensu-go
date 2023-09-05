@@ -1,0 +1,19 @@
+name: Sync Repo
+
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: "0 2 * * 1-5"
+  
+jobs:
+  sync_repo_job:
+    name: Sync Repo Job
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Run GitHub Repo Sync
+        run: gh repo sync
