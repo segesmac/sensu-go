@@ -5,6 +5,9 @@ on:
   schedule:
   - cron: "0 2 * * 1-5"
   
+env:
+  # Setting an environment variable with the value of a configuration variable
+  PARENT_FORK_NAME: ${{ vars.PARENT_FORK_NAME }}
 jobs:
   sync_repo_job:
     name: Sync Repo Job
@@ -16,4 +19,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Run GitHub Repo Sync
-        run: gh repo sync
+        run: |
+          echo "Parent Fork: $PARENT_FORK_NAME"
+          echo "Branch Name: $GITHUB_REF_NAME"
+          gh repo sync $PARENT_FORK_NAME -b $GITHUB_REF_NAME
