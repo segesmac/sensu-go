@@ -1,0 +1,32 @@
+name: GitlabSync
+
+on:
+  - push
+  - delete
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    name: GitLab Repo Sync
+    steps:
+    - uses: actions/checkout@v4.0.0
+      with:
+        fetch-depth: 0
+    - name: Run GitLab Repo Sync
+      run: |
+        echo "URL: ${{ vars.GITLAB_URL }}"
+        git remote add target https://${{ vars.GITLAB_USERNAME }}:${{ secrets.GITLAB_TOKEN }}@${{ vars.GITLAB_URL }}
+        case "${GITHUB_EVENT_NAME}" in
+            push)
+                echo "pushing -f..."
+                git push -f --all target
+                git push -f --tags target
+                ;;
+            delete)
+                echo "pushing -d... to ${GITHUB_REF} or ${GITHUB_EVENT_REF}"
+                git push -d target ${GITHUB_REF}
+                ;;
+            *)
+                break
+                ;;
+        esac
